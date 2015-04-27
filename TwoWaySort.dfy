@@ -7,11 +7,7 @@ TwoWaySort: Sorting of boolean array where two pointers i and j move
 3. Behavior: Verify that after execution of function TwoWaySort, 
              the following properties hold:
              (a) array is a permutation of its initial contents.
-             (b) array is sorted in increasing order. (I'm working on this 
-                 last one, trying to figure out how to write an ensures 
-                 statement that can check whether a boolean array is sorted 
-                 since <= doesn't work on bool values so have to think of 
-                 some other way to compare).
+             (b) array is sorted in increasing order.     
 */
 
 function total(a: array<bool>, i:int, key: bool): int
@@ -39,8 +35,8 @@ requires a1 != null;
 method TwoWaySort(a:array<bool>)
   requires a != null;
   modifies a;
-  ensures compare(a, old(a));
-  //ensures forall k:: forall l:: 0 <= k < l < a.Length ==> a[k] <= a[l]; working on this
+  ensures compare(a, old(a)); //ensuring permutation
+  ensures forall k:: forall l:: 0 <= k < l < a.Length ==> !a[k] || a[l]; //sortedness
 {
 	var i:int := 0;
 	var j:int := a.Length - 1;
@@ -48,7 +44,9 @@ method TwoWaySort(a:array<bool>)
 	invariant 0 <= i <= (j+1);
 	invariant (i-1) <= j < a.Length;	
 	decreases (j+1) - i;
-	decreases j - (i-1);
+	decreases j - (i-1);    
+    invariant forall k:: 0 <= k < i ==> !a[k];
+    invariant forall l:: j < l < a.Length ==> a[l];
 	{
 		if a[i] == false 
 		{

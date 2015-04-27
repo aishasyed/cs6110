@@ -1,23 +1,20 @@
 /*
-
 Invert:     Invert an injective array A on N elements in the 
 		    subrange from 0 to N − 1, i.e., the output array B 
 		    must be such that B[A[i]] = i for 0 <= i < N.
 		    You can assume that A is surjective.
 Properties: Show that the resulting array is also injective. For
 			bonus points, you can demonstrate other properties, 
-			e.g., that A and B are inverses. (I'm working on these).
+			e.g., that A and B are inverses.
 */
 
 method Invert(a: array<int>, b: array<int>)
+  requires a != b;
   requires a != null;
   requires b != null;
   requires a.Length == b.Length;
-  requires forall i :: 0 <= i < a.Length ==> 0 <= a[i] < b.Length;
-  /*ensures forall i :: 0 <= i < a.Length
-                      && 0 <= b[i] < a.Length 
-                      ==> a[b[i]] == i;
-  */                    
+  requires forall i :: 0 <= i < a.Length ==> 0 <= a[i] < a.Length;
+  requires forall i, j:: 0 <= i < a.Length && 0 <= j < a.Length && i != j ==> a[i] != a[j];
   ensures forall i :: 0 <= i < a.Length
                       && 0 <= a[i] < b.Length 
                       ==> b[a[i]] == i; 
@@ -27,21 +24,14 @@ method Invert(a: array<int>, b: array<int>)
 	while (i < a.Length) 
 	invariant a.Length == b.Length;
 	invariant 0 <= i <= b.Length;
+	invariant 0 <= i <= a.Length;
+	decreases a.Length-i;
+	modifies b;
     invariant forall j:: 0 <= j < a.Length ==> 0 <= a[j] < b.Length;
-    /*
-    invariant forall j:: j == (i-1) && 0 <= j < i 
- 						 && 0 <= b[j] < a.Length 
- 						 && 0 <= a[j] < b.Length 
-   						 ==> a[b[j]] == b[a[j]];  //showing inverse
-	invariant forall j:: 0 <= j < i
-						 && 0 <= b[j] < a.Length 
-                         ==> a[b[j]] == j; 
-    */                   
-	invariant forall j:: 0 <= j < i 
-						 && 0 <= a[j] < b.Length 
-	                     ==> b[a[j]] == j; 
+	invariant forall k:: 0 <= k < i <= a.Length ==> b[a[k]] == k; 
 	{
 		b[a[i]] := i;
+		assert (b[a[i]] == i);
 		i := i + 1;
 	}
 }
